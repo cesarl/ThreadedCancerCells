@@ -28,7 +28,7 @@ namespace TCC
 
 		void fill(CellType t)
 		{
-			memset((void*)_buffer, t, sizeof(CellType) * _total);
+			memset((void*)_buffer, (int)t, sizeof(CellType) * _total);
 		}
 
 		bool isCell(unsigned int x, unsigned int y, CellType t)

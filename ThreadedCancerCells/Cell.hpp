@@ -5,7 +5,7 @@
 
 namespace TCC
 {
-	enum CellType
+	enum CellType : unsigned char
 	{
 		Healthy = 0
 		, Cancer = 1
