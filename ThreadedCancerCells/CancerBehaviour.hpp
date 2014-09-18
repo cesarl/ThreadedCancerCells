@@ -9,6 +9,7 @@ namespace TCC
 {
 	class CancerBehaviour : public ThreadQueue
 	{
+		std::array<unsigned int, 3> _counter;
 	public:
 		struct Compute : TMQ::FutureData<std::array<unsigned int, 3>>
 		{
@@ -26,13 +27,14 @@ namespace TCC
 			_commandQueue.getDispatcher()
 				.handle<Compute>([&](Compute& msg)
 			{
+				_counter.fill(0);
 				for (auto i = msg.from; i < msg.to; ++i)
 				{
 					auto r = readBuf->computeCancer(i % TCC::windowWidth, i / TCC::windowWidth);
+					++_counter[r];
 					writeBuf->setCell(i, r);
 				}
-				std::array<unsigned int, 3> t{ { 1, 2, 3 } };
-				msg.result.set_value(t);
+				msg.result.set_value(_counter);
 			})
 				.handle<TMQ::CloseQueue>([&](TMQ::CloseQueue &msg){
 				result = false;

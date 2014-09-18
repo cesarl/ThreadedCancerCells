@@ -24,10 +24,12 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	std::array<unsigned int, 3> counter;
+	counter.fill(0);
 	std::vector<std::future<std::array<unsigned int, 3>>> res;
 	res.resize(TCC::cancerBehaviours.size());
 
-	auto range = TCC::windowWidth * TCC::windowHeight / TCC::cancerBehaviours.size();
+	auto range = (unsigned int)std::ceil((float)(TCC::windowWidth * TCC::windowHeight) / (float)TCC::cancerBehaviours.size());
 	for (auto i = 0; i < TCC::cancerBehaviours.size(); ++i)
 	{
 		auto from = range * i;
@@ -41,6 +43,9 @@ void display()
 	for (auto i = 0; i < res.size(); ++i)
 	{
 		auto t = res[i].get();
+		counter[0] += t[0];
+		counter[1] += t[1];
+		counter[2] += t[2];
 	}
 
 	TCC::readBuf->fillDisplay(*TCC::displayBuffer);
@@ -55,15 +60,19 @@ void display()
 	ImGui::Text("Injection Radius");
 	ImGui::SliderInt("Injection Radius", &TCC::injectionRadius, 1, 200);
 	ImGui::SliderInt("Injection Thickness", &TCC::injectionThickness, 1, 40);
-	ImGui::SliderInt("Cancer %", &TCC::cancerPercent, 1, 99);
+	if (ImGui::SliderInt("Cancer %", &TCC::cancerPercent, 1, 99))
+	{
+		TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
+	}
 	if (ImGui::SliderInt("Threads number", &TCC::threadNumber, 1, 48))
 	{
 		initThreads();
 	}
+	ImGui::Text("Healthy cells : %i", counter[TCC::Healthy]);
+	ImGui::Text("Cancer cells : %i", counter[TCC::Cancer]);
+	ImGui::Text("Medecine cells : %i", counter[TCC::Medecine]);
 
-	bool resetSimulation = false;
-	resetSimulation = ImGui::Button("Reset");
-	if (resetSimulation)
+	if (ImGui::Button("Reset"))
 	{
 		TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
 	}
