@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Cell.hpp"
-#include <vector>
 #include <algorithm>
 #include <cassert>
 #include "Display.hpp"
@@ -10,7 +9,7 @@ namespace TCC
 {
 	class GridBuffer
 	{
-		std::vector<CellType> _buffer;
+		CellType *_buffer;
 		unsigned int _width;
 		unsigned int _height;
 		unsigned int _total;
@@ -20,11 +19,16 @@ namespace TCC
 			, _height(height)
 			, _total(width * height)
 		{
-			_buffer.resize(_total);
+			_buffer = new CellType[_total];
 		}
+		~GridBuffer()
+		{
+			delete[] _buffer;
+		}
+
 		void fill(CellType t)
 		{
-			std::fill(std::begin(_buffer), std::end(_buffer), t);
+			memset((void*)_buffer, t, sizeof(CellType) * _total);
 		}
 
 		bool isCell(unsigned int x, unsigned int y, CellType t)
@@ -47,7 +51,7 @@ namespace TCC
 		void fillDisplay(Display &display)
 		{
 			auto so = sizeof(unsigned char);
-			for (unsigned int i = 0; i < _buffer.size(); ++i)
+			for (unsigned int i = 0; i < _total; ++i)
 			{
 				memcpy((void*)(&display._buffer[i * 3]), (void*)(&Style[(std::size_t)(_buffer[i] * 3)]), so * 3);
 			}

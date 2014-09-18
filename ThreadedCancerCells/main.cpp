@@ -1,5 +1,4 @@
-#include <windows.h>
-#include <GL/glut.h>
+#include "Vendors/GL/freeglut.h"
 
 #include "Display.hpp"
 #include "Globals.hpp"
@@ -7,11 +6,43 @@
 #include "GridBuffer.hpp"
 #include "CancerBehaviour.hpp"
 
+
+void initThreads()
+{
+	for (auto &e : TCC::cancerBehaviours)
+		e->quit();
+	TCC::cancerBehaviours.clear();
+	TCC::cancerBehaviours.resize(TCC::threadNumber);
+	for (auto i = 0; i < TCC::cancerBehaviours.size(); ++i)
+	{
+		TCC::cancerBehaviours[i] = std::make_unique<TCC::CancerBehaviour>();
+		TCC::cancerBehaviours[i]->launch();
+	}
+}
+
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	TCC::CancerBehaviour(0, TCC::windowWidth * TCC::windowHeight);
+	std::vector<std::future<std::array<unsigned int, 3>>> res;
+	res.resize(TCC::cancerBehaviours.size());
+
+	auto range = TCC::windowWidth * TCC::windowHeight / TCC::cancerBehaviours.size();
+	for (auto i = 0; i < TCC::cancerBehaviours.size(); ++i)
+	{
+		auto from = range * i;
+		auto to = (from + range);
+		if (to > TCC::windowWidth * TCC::windowHeight)
+			to = TCC::windowWidth * TCC::windowHeight;
+		res[i] = TCC::cancerBehaviours[i]->getCommandQueue()
+			.priorityFutureEmplace<TCC::CancerBehaviour::Compute, std::array<unsigned int, 3>>(from, to);
+	}
+
+	for (auto i = 0; i < res.size(); ++i)
+	{
+		auto t = res[i].get();
+	}
+
 	TCC::readBuf->fillDisplay(*TCC::displayBuffer);
 	for (auto i = 0; i < TCC::injectionThickness; ++i)
 	{
@@ -25,6 +56,10 @@ void display()
 	ImGui::SliderInt("Injection Radius", &TCC::injectionRadius, 1, 200);
 	ImGui::SliderInt("Injection Thickness", &TCC::injectionThickness, 1, 40);
 	ImGui::SliderInt("Cancer %", &TCC::cancerPercent, 1, 99);
+	if (ImGui::SliderInt("Threads number", &TCC::threadNumber, 1, 48))
+	{
+		initThreads();
+	}
 
 	bool resetSimulation = false;
 	resetSimulation = ImGui::Button("Reset");
@@ -50,6 +85,7 @@ void initialize ()
 	TCC::readBuf = TCC::buffer1;
 	TCC::writeBuf = TCC::buffer2;
 	TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
+	initThreads();
 	ImguiConf::InitImGui();
 }
 
@@ -58,7 +94,6 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
 	switch ( key )
 	{
 	case 27:
-		exit ( 0 );
 		break;
 
 	default:
@@ -105,8 +140,13 @@ int main(int argc, char **argv)
 	glutPassiveMotionFunc(passiveMouse);
 	glutMotionFunc(passiveMouse);
 	initialize();
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+
 	glutMainLoop();
+	TCC::running = true;
 	delete TCC::displayBuffer;
 	ImGui::Shutdown();
+	for (auto &e : TCC::cancerBehaviours)
+		e->quit();
 	return 0;
 }

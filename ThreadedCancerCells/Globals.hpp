@@ -1,11 +1,13 @@
 #pragma once
 
 #include <glm/fwd.hpp>
+#include <vector>
 
 namespace TCC
 {
 	class Display;
 	class GridBuffer;
+	class CancerBehaviour;
 
 	//////////
 	/// VERY DIRTY GLOBALS - Shame on me :(
@@ -19,11 +21,15 @@ namespace TCC
 	int injectionRadius = 30;
 	int injectionThickness = 1;
 	int cancerPercent = 30;
+	int threadNumber = 4;
+	bool running;
 
 	GridBuffer *buffer1;
 	GridBuffer *buffer2;
 	GridBuffer *readBuf;
 	GridBuffer *writeBuf;
+
+	std::vector<std::unique_ptr<TCC::CancerBehaviour>> cancerBehaviours;
 
 	typedef glm::uvec2 Position;
 	typedef glm::uvec3 Color;
