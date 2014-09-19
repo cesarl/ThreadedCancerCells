@@ -5,7 +5,7 @@
 #include "ImguiConfig.hpp"
 #include "GridBuffer.hpp"
 #include "CancerBehaviour.hpp"
-
+#include "MedecineManager.hpp"
 
 void initThreads()
 {
@@ -49,11 +49,14 @@ void display()
 		counter[2] += t[2];
 	}
 
+	TCC::medecineManager->update();
+
 	TCC::readBuf->fillDisplay(*TCC::displayBuffer);
-	/*for (auto i = 0; i < TCC::injectionThickness; ++i)
+	for (auto i = 0; i < TCC::injectionThickness; ++i)
 	{
-		TCC::displayBuffer->drawCircle(TCC::Position(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y), TCC::injectionRadius + i, TCC::Color(255));
-	}*/
+		TCC::displayBuffer->drawCircle(TCC::Position(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y), TCC::injectionRadius + i, TCC::Color(30));
+	}
+	TCC::displayBuffer->drawLine( TCC::Position(0, 0), TCC::Position(300, 300),TCC::Color(123, 12, 231));
 	TCC::displayBuffer->render();
 	std::swap(TCC::readBuf, TCC::writeBuf);
 
@@ -62,8 +65,8 @@ void display()
 	ImGui::SliderInt("Injection Radius", &TCC::injectionRadius, 1, 200);
 	ImGui::SliderInt("Injection Thickness", &TCC::injectionThickness, 1, 40);
 
-	//if (TCC::rMouse)
-	//	TCC::writeBuf->inject(TCC::Position(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y));
+	if (TCC::rMouse)
+		TCC::medecineManager->inject();
 
 	if (ImGui::SliderInt("Cancer %", &TCC::cancerPercent, 1, 99))
 	{
@@ -100,6 +103,7 @@ void initialize ()
 	TCC::readBuf = TCC::buffer1;
 	TCC::writeBuf = TCC::buffer2;
 	TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
+	TCC::medecineManager = new TCC::MedecineManager(TCC::windowWidth, TCC::windowHeight);
 	initThreads();
 	ImguiConf::InitImGui();
 }

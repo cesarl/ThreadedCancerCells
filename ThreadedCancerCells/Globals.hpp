@@ -8,6 +8,7 @@ namespace TCC
 	class Display;
 	class GridBuffer;
 	class CancerBehaviour;
+	class MedecineManager;
 
 	//////////
 	/// VERY DIRTY GLOBALS - Shame on me :(
@@ -28,6 +29,8 @@ namespace TCC
 	GridBuffer *buffer2;
 	GridBuffer *readBuf;
 	GridBuffer *writeBuf;
+
+	MedecineManager *medecineManager;
 
 	std::vector<std::unique_ptr<TCC::CancerBehaviour>> cancerBehaviours;
 

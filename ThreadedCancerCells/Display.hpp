@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <GL/gl.h>
 #include "Globals.hpp"
+#include <cmath>
 
 namespace TCC
 {
@@ -61,25 +62,48 @@ namespace TCC
 			_buffer[(position.y * (_width * 3)) + position.x * 3 + 2] = color.z;
 		}
 
-		void drawLine(const glm::uvec2& from, const glm::uvec2& to, const glm::uvec3& color)
+		void drawLine(const glm::uvec2& _from, const glm::uvec2& _to, const glm::uvec3& color)
 		{
-			auto dist = to - from;
-			auto d = 2 * dist.y - dist.x;
-			drawPixel(from, color);
-			auto y = from.y;
-
-			for (auto x = from.x + 1; x <= to.x; ++x)
+			auto from = _from;
+			auto to = _to;
+			const bool steep = (fabs((float)to.y - from.y) > fabs((float)to.x - from.y));
+			if (steep)
 			{
-				if (d > 0)
+				std::swap(from.x, from.y);
+				std::swap(to.x, to.y);
+			}
+ 
+			if (from.x > to.x)
+			{
+				std::swap(from.x, to.x);
+				std::swap(from.y, to.y);
+			}
+ 
+			const float dx = to.x - from.y;
+			const float dy = fabs((float)to.y - from.y);
+ 
+			float error = dx / 2.0f;
+			const int ystep = (from.y < to.y) ? 1 : -1;
+			int y = from.y;
+ 
+			const int maxX = to.x;
+ 
+			for (int x = from.x; x < maxX; x++)
+			{
+				if (steep)
 				{
-					y = y + 1;
-					drawPixel(glm::uvec2(x, y), color);
-					d = d + (2 * dist.y - 2 * dist.x);
+					this->drawPixel(glm::uvec2(y, x), color);
 				}
 				else
 				{
-					drawPixel(glm::uvec2(x, y), color);
-					d = d + (2 * dist.y);
+					this->drawPixel(glm::uvec2(x, y), color);
+				}
+ 
+				error -= dy;
+				if (error < 0)
+				{
+					y += ystep;
+					error += dx;
 				}
 			}
 		}
