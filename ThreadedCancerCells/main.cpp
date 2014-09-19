@@ -50,10 +50,10 @@ void display()
 	}
 
 	TCC::readBuf->fillDisplay(*TCC::displayBuffer);
-	for (auto i = 0; i < TCC::injectionThickness; ++i)
+	/*for (auto i = 0; i < TCC::injectionThickness; ++i)
 	{
 		TCC::displayBuffer->drawCircle(TCC::Position(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y), TCC::injectionRadius + i, TCC::Color(255));
-	}
+	}*/
 	TCC::displayBuffer->render();
 	std::swap(TCC::readBuf, TCC::writeBuf);
 
@@ -61,6 +61,10 @@ void display()
 	ImGui::Text("Injection Radius");
 	ImGui::SliderInt("Injection Radius", &TCC::injectionRadius, 1, 200);
 	ImGui::SliderInt("Injection Thickness", &TCC::injectionThickness, 1, 40);
+
+	//if (TCC::rMouse)
+	//	TCC::writeBuf->inject(TCC::Position(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y));
+
 	if (ImGui::SliderInt("Cancer %", &TCC::cancerPercent, 1, 99))
 	{
 		TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
@@ -77,6 +81,7 @@ void display()
 	{
 		TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
 	}
+
 	ImGui::Render();
 
 	glutSwapBuffers();
