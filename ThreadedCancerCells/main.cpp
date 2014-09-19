@@ -37,7 +37,8 @@ void display()
 		if (to > TCC::windowWidth * TCC::windowHeight)
 			to = TCC::windowWidth * TCC::windowHeight;
 		res[i] = TCC::cancerBehaviours[i]->getCommandQueue()
-			.priorityFutureEmplace<TCC::CancerBehaviour::Compute, std::array<unsigned int, 3>>(from, to);
+			.emplaceFuture<TCC::CancerBehaviour::Compute, std::array<unsigned int, 3>>(from, to);
+		TCC::cancerBehaviours[i]->getCommandQueue().releaseReadability();
 	}
 
 	for (auto i = 0; i < res.size(); ++i)

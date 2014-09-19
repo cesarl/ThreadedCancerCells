@@ -13,6 +13,13 @@ namespace TCC
 		, END = 3
 	};
 
+	struct Cell
+	{
+		CellType type = Medecine;
+		bool medecine = false;
+		glm::i16vec2 direction;
+	};
+
 	static const unsigned char Style[9] = {
 		0, 255, 0 // Healthy
 		, 255, 0, 0 // Cancer

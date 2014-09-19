@@ -28,7 +28,7 @@ namespace TCC
 
 		void fill(const glm::uvec3& color)
 		{
-			static auto so = sizeof(unsigned char) * 3;
+			auto so = sizeof(unsigned char) * 3;
 			unsigned char c[3] = { color.x, color.y, color.z };
 			auto t = _width * _height;
 			for (auto i = 0; i < _width; ++i)

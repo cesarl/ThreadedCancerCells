@@ -9,7 +9,7 @@ namespace TCC
 {
 	class GridBuffer
 	{
-		CellType *_buffer;
+		Cell *_buffer;
 		unsigned int _width;
 		unsigned int _height;
 		unsigned int _total;
@@ -19,7 +19,7 @@ namespace TCC
 			, _height(height)
 			, _total(width * height)
 		{
-			_buffer = new CellType[_total];
+			_buffer = new Cell[_total];
 		}
 		~GridBuffer()
 		{
@@ -28,24 +28,24 @@ namespace TCC
 
 		void fill(CellType t)
 		{
-			memset((void*)_buffer, (int)t, sizeof(CellType) * _total);
+			memset((void*)_buffer, (int)t, sizeof(Cell) * _total);
 		}
 
 		bool isCell(unsigned int x, unsigned int y, CellType t)
 		{
 			if (x >= _width || y >= _height)
 				return false;
-			return _buffer[y * _width + x] == t;
+			return _buffer[y * _width + x].type == t;
 		}
 
 		void setCell(unsigned int x, unsigned int y, CellType t)
 		{
-			_buffer[y * _width + x] = t;
+			_buffer[y * _width + x].type = t;
 		}
 
 		void setCell(unsigned int i, CellType t)
 		{
-			_buffer[i] = t;
+			_buffer[i].type = t;
 		}
 
 		void fillDisplay(Display &display)
@@ -53,24 +53,28 @@ namespace TCC
 			auto so = sizeof(unsigned char);
 			for (unsigned int i = 0; i < _total; ++i)
 			{
-				memcpy((void*)(&display._buffer[i * 3]), (void*)(&Style[(std::size_t)(_buffer[i] * 3)]), so * 3);
+				memcpy((void*)(&display._buffer[i * 3]), (void*)(&Style[(std::size_t)(_buffer[i].type * 3)]), so * 3);
 			}
 		}
 
 		CellType computeCancer(unsigned int x, unsigned int y)
 		{
 			auto index = y * _width + x;
-			if (_buffer[index] != Healthy || y == 0 || y == _height - 1 || x == 0 || x == _width - 1)
-				return _buffer[index];
+			if (_buffer[index].type != Healthy || y == 0 || y == _height - 1 || x == 0 || x == _width - 1)
+				return _buffer[index].type;
 			unsigned short t = 0;
-			for (short yy = -1; yy < 2; ++yy)
-			{
-				for (short xx = -1; xx < 2; ++xx)
-				{
-					if (_buffer[(y + yy) * _width + x + xx] == Cancer)
-						++t;
-				}
-			}
+			auto yw = 0;
+			yw = ((y - 1) * _width) + x - 1;
+			t += _buffer[yw].type == Cancer;
+			t += _buffer[++yw].type == Cancer;
+			t += _buffer[++yw].type == Cancer;
+			yw = ((y) * _width) + x - 1;
+			t += _buffer[yw].type == Cancer;
+			t += _buffer[yw + 2].type == Cancer;
+			yw = ((y + 1)* _width) + x - 1;
+			t += _buffer[yw].type == Cancer;
+			t += _buffer[++yw].type == Cancer;
+			t += _buffer[++yw].type == Cancer;
 			if (t >= 6)
 				return Cancer;
 			return Healthy;
