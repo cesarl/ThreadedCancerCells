@@ -30,9 +30,7 @@ namespace TCC
 				_counter.fill(0);
 				for (auto i = msg.from; i < msg.to; ++i)
 				{
-					/*auto r = */buffer->computeCancer(i % TCC::windowWidth, i / TCC::windowWidth);
-					//++_counter[r];
-					//writeBuf->setCell(i, r);
+					buffer->computeCancer(i % TCC::windowWidth, i / TCC::windowWidth);
 				}
 				msg.result.set_value(_counter);
 			})

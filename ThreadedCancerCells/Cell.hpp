@@ -16,6 +16,6 @@ namespace TCC
 	static const unsigned char Style[12] = {
 		0, 255, 0 // Healthy
 		, 255, 0, 0 // Cancer
-		, 0, 0, 255 // Medecine
-	    , 255, 255, 255}; // None
+		, 255, 255, 0 // Medecine
+	    , 0, 0, 0}; // None
 }

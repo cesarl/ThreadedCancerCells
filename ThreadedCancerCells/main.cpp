@@ -23,8 +23,6 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	std::array<unsigned int, 3> counter;
-	counter.fill(0);
 	std::vector<std::future<std::array<unsigned int, 3>>> res;
 	res.resize(TCC::cancerBehaviours.size());
 
@@ -40,13 +38,15 @@ void display()
 //		TCC::cancerBehaviours[i]->getCommandQueue().releaseReadability();
 	}
 
+
 	for (auto i = 0; i < res.size(); ++i)
 	{
 		auto t = res[i].get();
-		counter[0] += t[0];
-		counter[1] += t[1];
-		counter[2] += t[2];
+		//counter[0] += t[0];
+		//counter[1] += t[1];
+		//counter[2] += t[2];
 	}
+
 
 	TCC::buffer->fillDisplay(*TCC::displayBuffer);
 
@@ -63,10 +63,22 @@ void display()
 	TCC::displayBuffer->render();
 
 	ImguiConf::UpdateImGui();
+
+	ImGui::Text("Right click to inject medecine ! \nCancer cells are red, healthy one are green, and medecine is yellow ! \n");
+
+	static float ms_per_frame[120] = { 0 };
+	static int ms_per_frame_idx = 0;
+	static float ms_per_frame_accum = 0.0f;
+	ms_per_frame_accum -= ms_per_frame[ms_per_frame_idx];
+	ms_per_frame[ms_per_frame_idx] = ImGui::GetIO().DeltaTime * 1000.0f;
+	ms_per_frame_accum += ms_per_frame[ms_per_frame_idx];
+	ms_per_frame_idx = (ms_per_frame_idx + 1) % 120;
+	const float ms_per_frame_avg = ms_per_frame_accum / 120;
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", ms_per_frame_avg, 1000.0f / ms_per_frame_avg);
+
 	ImGui::Text("Injection Radius");
 	ImGui::SliderInt("Injection Radius", &TCC::injectionRadius, 1, 200);
 	ImGui::SliderInt("Injection Thickness", &TCC::injectionThickness, 1, 100);
-
 
 	if (ImGui::SliderInt("Cancer %", &TCC::cancerPercent, 0, 100 - TCC::healthyPercent))
 	{
@@ -81,9 +93,10 @@ void display()
 	{
 		initThreads();
 	}
-	ImGui::Text("Healthy cells : %i", counter[TCC::Healthy]);
-	ImGui::Text("Cancer cells : %i", counter[TCC::Cancer]);
-	ImGui::Text("Medecine cells : %i", counter[TCC::Medecine]);
+	//ImGui::Text("Healthy cells : %i", TCC::Counter[TCC::Healthy]);
+	//ImGui::Text("Cancer cells : %i", TCC::Counter[TCC::Cancer]);
+	//ImGui::Text("Medecine cells : %i", TCC::Counter[TCC::Medecine]);
+	//ImGui::Text("Empty cells : %i", TCC::Counter[TCC::None]);
 
 	if (ImGui::Button("Reset"))
 	{
@@ -106,6 +119,10 @@ void initialize ()
 	TCC::buffer = new TCC::GridBuffer(TCC::windowWidth, TCC::windowHeight);
 	initThreads();
 	ImguiConf::InitImGui();
+	TCC::Counter[0] = 0;
+	TCC::Counter[1] = 0;
+	TCC::Counter[2] = 0;
+	TCC::Counter[3] = 0;
 	TCC::buffer->randomFill();
 }
 

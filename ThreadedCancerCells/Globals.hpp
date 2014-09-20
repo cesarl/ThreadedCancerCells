@@ -2,6 +2,8 @@
 
 #include <glm/fwd.hpp>
 #include <vector>
+#include <atomic>
+#include <array>
 
 namespace TCC
 {
@@ -22,8 +24,8 @@ namespace TCC
 	int injectionRadius = 2;
 	int injectionThickness = 4;
 
-	int cancerPercent = 33;
-	int healthyPercent = 33;
+	int cancerPercent = 45;
+	int healthyPercent = 30;
 
 	int threadNumber = 4;
 	bool running;
@@ -36,4 +38,6 @@ namespace TCC
 
 	typedef glm::uvec2 Position;
 	typedef glm::uvec3 Color;
+
+	static std::array<std::atomic_uint, 4> Counter;
 }
