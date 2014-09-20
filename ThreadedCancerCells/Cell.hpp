@@ -10,11 +10,12 @@ namespace TCC
 		Healthy = 0
 		, Cancer = 1
 		, Medecine = 2
-		, END = 3
+		, None = 3
 	};
 
-	static const unsigned char Style[9] = {
+	static const unsigned char Style[12] = {
 		0, 255, 0 // Healthy
 		, 255, 0, 0 // Cancer
-		, 0, 0, 255 }; // Medecine
+		, 0, 0, 255 // Medecine
+	    , 255, 255, 255}; // None
 }

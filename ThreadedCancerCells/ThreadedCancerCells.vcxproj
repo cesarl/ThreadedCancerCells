@@ -84,7 +84,6 @@
   <ItemGroup>
     <ClInclude Include="GridBuffer.hpp" />
     <ClInclude Include="ImguiConfig.hpp" />
-    <ClInclude Include="MedecineManager.hpp" />
     <ClInclude Include="Cell.hpp" />
     <ClInclude Include="CancerBehaviour.hpp" />
     <ClInclude Include="Vendors\imgui\imconfig.h" />

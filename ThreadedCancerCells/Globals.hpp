@@ -19,16 +19,16 @@ namespace TCC
 	static GLuint fontTex;
 	double mouse_x, mouse_y;
 	bool rMouse, lMouse;
-	int injectionRadius = 30;
-	int injectionThickness = 1;
-	int cancerPercent = 30;
+	int injectionRadius = 2;
+	int injectionThickness = 4;
+
+	int cancerPercent = 33;
+	int healthyPercent = 33;
+
 	int threadNumber = 4;
 	bool running;
 
-	GridBuffer *buffer1;
-	GridBuffer *buffer2;
-	GridBuffer *readBuf;
-	GridBuffer *writeBuf;
+	GridBuffer *buffer;
 
 	MedecineManager *medecineManager;
 

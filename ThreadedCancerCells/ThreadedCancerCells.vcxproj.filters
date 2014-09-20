@@ -65,9 +65,6 @@
     <ClInclude Include="Vendors\imgui\stb_textedit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MedecineManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GridBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

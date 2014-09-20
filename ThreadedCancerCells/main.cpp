@@ -5,7 +5,6 @@
 #include "ImguiConfig.hpp"
 #include "GridBuffer.hpp"
 #include "CancerBehaviour.hpp"
-#include "MedecineManager.hpp"
 
 void initThreads()
 {
@@ -37,8 +36,8 @@ void display()
 		if (to > TCC::windowWidth * TCC::windowHeight)
 			to = TCC::windowWidth * TCC::windowHeight;
 		res[i] = TCC::cancerBehaviours[i]->getCommandQueue()
-			.emplaceFuture<TCC::CancerBehaviour::Compute, std::array<unsigned int, 3>>(from, to);
-		TCC::cancerBehaviours[i]->getCommandQueue().releaseReadability();
+			.priorityFutureEmplace<TCC::CancerBehaviour::Compute, std::array<unsigned int, 3>>(from, to);
+//		TCC::cancerBehaviours[i]->getCommandQueue().releaseReadability();
 	}
 
 	for (auto i = 0; i < res.size(); ++i)
@@ -49,29 +48,35 @@ void display()
 		counter[2] += t[2];
 	}
 
-	TCC::medecineManager->update();
+	TCC::buffer->fillDisplay(*TCC::displayBuffer);
 
-	TCC::readBuf->fillDisplay(*TCC::displayBuffer);
 	for (auto i = 0; i < TCC::injectionThickness; ++i)
 	{
 		TCC::displayBuffer->drawCircle(TCC::Position(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y), TCC::injectionRadius + i, TCC::Color(30));
 	}
-	TCC::displayBuffer->drawLine( TCC::Position(0, 0), TCC::Position(300, 300),TCC::Color(123, 12, 231));
+
+	if (TCC::rMouse)
+	{
+		TCC::buffer->inject(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y);
+	}
+
 	TCC::displayBuffer->render();
-	std::swap(TCC::readBuf, TCC::writeBuf);
 
 	ImguiConf::UpdateImGui();
 	ImGui::Text("Injection Radius");
 	ImGui::SliderInt("Injection Radius", &TCC::injectionRadius, 1, 200);
-	ImGui::SliderInt("Injection Thickness", &TCC::injectionThickness, 1, 40);
+	ImGui::SliderInt("Injection Thickness", &TCC::injectionThickness, 1, 100);
 
-	if (TCC::rMouse)
-		TCC::medecineManager->inject();
 
-	if (ImGui::SliderInt("Cancer %", &TCC::cancerPercent, 1, 99))
+	if (ImGui::SliderInt("Cancer %", &TCC::cancerPercent, 0, 100 - TCC::healthyPercent))
 	{
-		TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
+		TCC::buffer->randomFill();
 	}
+	if (ImGui::SliderInt("Healthy %", &TCC::healthyPercent, 0, 100 - TCC::cancerPercent))
+	{
+		TCC::buffer->randomFill();
+	}
+
 	if (ImGui::SliderInt("Threads number", &TCC::threadNumber, 1, 48))
 	{
 		initThreads();
@@ -82,12 +87,11 @@ void display()
 
 	if (ImGui::Button("Reset"))
 	{
-		TCC::medecineManager->reset();
-		TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
+		TCC::buffer->randomFill();
 	}
 
 	ImGui::Render();
-
+	TCC::buffer->swap();
 	glutSwapBuffers();
 }
 
@@ -99,14 +103,10 @@ void initialize ()
 	glLoadIdentity();
 	glClearColor(1, 1, 1, 1);
 	TCC::displayBuffer = new TCC::Display(TCC::windowWidth, TCC::windowHeight);
-	TCC::buffer1 = new TCC::GridBuffer(TCC::windowWidth, TCC::windowHeight);
-	TCC::buffer2 = new TCC::GridBuffer(TCC::windowWidth, TCC::windowHeight);
-	TCC::readBuf = TCC::buffer1;
-	TCC::writeBuf = TCC::buffer2;
-	TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
-	TCC::medecineManager = new TCC::MedecineManager(TCC::windowWidth, TCC::windowHeight);
+	TCC::buffer = new TCC::GridBuffer(TCC::windowWidth, TCC::windowHeight);
 	initThreads();
 	ImguiConf::InitImGui();
+	TCC::buffer->randomFill();
 }
 
 void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
@@ -114,6 +114,7 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
 	switch ( key )
 	{
 	case 27:
+		glutLeaveMainLoop();
 		break;
 
 	default:
