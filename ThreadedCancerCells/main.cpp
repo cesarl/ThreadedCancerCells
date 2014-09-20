@@ -82,6 +82,7 @@ void display()
 
 	if (ImGui::Button("Reset"))
 	{
+		TCC::medecineManager->reset();
 		TCC::readBuf->randomFill(TCC::Cancer, TCC::cancerPercent, TCC::Healthy);
 	}
 

@@ -6,7 +6,22 @@
 
 namespace TCC
 {
-	typedef bool CellMed;
+//	typedef bool CellMed;
+	struct CellMed
+	{
+		glm::uvec2 center;
+		glm::vec2 destination;
+		unsigned int step;
+		bool tof;
+		bool operator!()
+		{
+			return tof;
+		}
+		void operator=(bool _tof)
+		{
+			tof = _tof;
+		}
+	};
 	class MedecineManager
 	{
 		CellMed *_buffer1;
@@ -41,6 +56,9 @@ namespace TCC
 			if (x >= _width || x < 0 || y >= _height || y < 0)
 				return 0;
 			_write[x + _width * y] = tof;
+			_write[x + _width * y].center = _center;
+			_write[x + _width * y].destination = glm::vec2(x, y) + (glm::vec2(x, y) - _center) * 1000.0f;
+			_write[x + _width * y].step = 0;
 			return 1;
 		}
 
@@ -89,11 +107,17 @@ namespace TCC
 			}
 		}
 
+		void reset()
+		{
+			_counter = 0;
+			memset((void*)_write, false, sizeof(CellMed) * _total);
+		}
+
 		bool progress(unsigned int f, glm::uvec2 &p)
 		{
-			auto from = glm::vec2(f % _width, f / _width);
-			auto inidist = from - _center;
-			auto to = (from + inidist * 2.0f);
+			auto from = _read[f].center;//glm::vec2(f % _width, f / _width);
+			auto to = _read[f].destination;
+
 			int DX = to.x - from.y;
 			int DY = to.y - from.y;
 			int N = 0;
@@ -101,14 +125,18 @@ namespace TCC
 			else N = abs(DY);
 			float SX = (float)DX / (float)N;
 			float SY = (float)DY / (float)N;
-			for (int jj = 0; jj < N; jj++)
+			unsigned int t = 0;
+			for (int jj = 0; jj < N && t <= _read[f].step; jj++)
 			{
 				from.x += SX;
 				from.y += SY;
 				p = from;
 				if (p.x >= _width || p.x < 0 || p.y >= _height || p.y < 0)
 					return false;
-				return true;
+				if (t++ == _read[f].step)
+				{
+					return true;
+				}
 				//setPixel(PX, PY);
 			}
 			return true;
@@ -120,7 +148,7 @@ namespace TCC
 			memset((void*)_write, false, sizeof(CellMed) * _total);
 			for (unsigned int i = 0; i < _total; ++i)
 			{
-				if (_read[i])
+				if (_read[i].tof)
 				{
 					glm::uvec2 n;
 					if (progress(i, n))
@@ -128,9 +156,14 @@ namespace TCC
 						//TCC::displayBuffer->drawPixel(TCC::Position(n.x, n.y), TCC::Color(123, 23, 122));
 						writeBuf->setCell(n.x, n.y, Medecine);
 						_write[n.x + n.y * _width] = true;
+						_write[n.x + n.y * _width].center = _read[i].center;
+						_write[n.x + n.y * _width].destination = _read[i].destination;
+						_write[n.x + n.y * _width].step = ++(_read[i].step);
 					}
 					else
+					{
 						--_counter;
+					}
 				}
 			}
 		}
