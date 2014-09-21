@@ -30,6 +30,8 @@ namespace TCC
 	int threadNumber = 4;
 	bool running;
 
+	float zoom = 1.0f;
+
 	GridBuffer *buffer;
 
 	MedecineManager *medecineManager;

@@ -145,6 +145,7 @@ namespace TCC
 
 		void render()
 		{
+			glPixelZoom(TCC::zoom, TCC::zoom);
 			glDrawPixels(_width, _height, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)_buffer);
 		}
 

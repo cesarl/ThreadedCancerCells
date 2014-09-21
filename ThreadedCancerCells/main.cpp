@@ -52,12 +52,15 @@ void display()
 
 	for (auto i = 0; i < TCC::injectionThickness; ++i)
 	{
-		TCC::displayBuffer->drawCircle(TCC::Position(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y), TCC::injectionRadius + i, TCC::Color(30));
+		if (TCC::injectionRadius == 1 && TCC::injectionThickness == 1)
+			TCC::displayBuffer->drawPixel(TCC::Position(TCC::mouse_x / TCC::zoom, (TCC::windowHeight - TCC::mouse_y) / TCC::zoom), TCC::Color(30));
+		else
+			TCC::displayBuffer->drawCircle(TCC::Position(TCC::mouse_x / TCC::zoom, (TCC::windowHeight - TCC::mouse_y) / TCC::zoom), TCC::injectionRadius + i, TCC::Color(30));
 	}
 
 	if (TCC::rMouse)
 	{
-		TCC::buffer->inject(TCC::mouse_x, TCC::windowHeight - TCC::mouse_y);
+		TCC::buffer->inject(TCC::mouse_x / TCC::zoom, (TCC::windowHeight - TCC::mouse_y) / TCC::zoom);
 	}
 
 	TCC::displayBuffer->render();
@@ -92,6 +95,10 @@ void display()
 	if (ImGui::SliderInt("Threads number", &TCC::threadNumber, 1, 48))
 	{
 		initThreads();
+	}
+
+	if (ImGui::SliderFloat("Zoom ", &TCC::zoom, 1, 15));
+	{
 	}
 	//ImGui::Text("Healthy cells : %i", TCC::Counter[TCC::Healthy]);
 	//ImGui::Text("Cancer cells : %i", TCC::Counter[TCC::Cancer]);

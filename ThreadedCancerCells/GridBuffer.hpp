@@ -204,6 +204,11 @@ namespace TCC
 		void inject(unsigned int cx, unsigned int cy)
 		{
 			auto center = TCC::Position(cx, cy);
+			if (TCC::injectionRadius == 1 && TCC::injectionThickness == 1)
+			{
+				setCellWithRule(center.x, center.y, Medecine);
+				return;
+			}
 			for (auto i = 0; i < TCC::injectionThickness; ++i)
 			{
 				auto radius = TCC::injectionRadius + i;
