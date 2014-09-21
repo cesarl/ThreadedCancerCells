@@ -25,6 +25,8 @@ namespace TCC
 		{
 			_buffer1 = new CellType[_total];
 			_buffer2 = new CellType[_total];
+			memset(_buffer1, None, sizeof(CellType) * _total);
+			memset(_buffer2, None, sizeof(CellType) * _total);
 			_read = _buffer1;
 			_write = _buffer2;
 		}
@@ -125,23 +127,31 @@ namespace TCC
 			return false;
 		}
 
-		unsigned short countNeighbours(CellType type, int x, int y)
+		bool countNeighbours(CellType type, int x, int y, unsigned short min)
 		{
-			unsigned short t = 0;
+			short t = 8 - min + 1;
 			auto yw = 0;
 
 			yw = ((y - 1) * _width) + x - 1;
-			t += _read[yw] == type;
-			t += _read[++yw] == type;
-			t += _read[++yw] == type;
+			t -= _read[yw] != type;
+			if (t <= 0) return false;			
+			t -= _read[++yw] != type;
+			if (t <= 0) return false;
+			t -= _read[++yw] != type;
+			if (t <= 0) return false;
 			yw = ((y) * _width) + x - 1;
-			t += _read[yw] == type;
-			t += _read[yw + 2] == type;
+			t -= _read[yw] != type;
+			if (t <= 0) return false;			
+			t -= _read[yw + 2] != type;
+			if (t <= 0) return false;
 			yw = ((y + 1)* _width) + x - 1;
-			t += _read[yw] == type;
-			t += _read[++yw] == type;
-			t += _read[++yw] == type;
-			return t;
+			t -= _read[yw] != type;
+			if (t <= 0) return false;			
+			t -= _read[++yw] != type;
+			if (t <= 0) return false;			
+			t -= _read[++yw] != type;
+			if (t <= 0) return false;			
+			return true;
 		}
 
 		void computeCancer(int x, int y)
@@ -149,15 +159,16 @@ namespace TCC
 			auto a = 0;
 			auto index = y * _width + x;
 			// H -> C
-			if (_read[index] == Healthy && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Cancer, x, y) >= 6)
+			auto &r = _read[index];
+			if (r == Healthy && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Cancer, x, y, 6))
 			{
-				--TCC::Counter[_read[index]];
+				--TCC::Counter[r];
 				++TCC::Counter[Cancer];
 				_write[index] = Cancer;
 				return;
 			}
 			// C -> H
-			if (_read[index] == Cancer && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Medecine, x, y) >= 6)
+			if (r == Cancer && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Medecine, x, y, 6))
 			{
 				auto yw = 0;
 
@@ -194,7 +205,7 @@ namespace TCC
 				return;
 			}
 			// E -> M
-			if (_read[index] == None && hasNeighbour(Medecine, x, y))
+			if (r == None && hasNeighbour(Medecine, x, y))
 			{
 				_write[index] = Medecine;
 				return;
