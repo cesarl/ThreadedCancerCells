@@ -116,14 +116,23 @@ void display()
 		TCC::buffer->randomFill();
 	}
 
-	if (ImGui::Button("Pause"))
+	static std::string playpausestr = "Pause";
+
+	if (ImGui::Button(playpausestr.c_str()))
 	{
 		pause = !pause;
+		if (pause)
+			playpausestr = "Play";
+		else
+			playpausestr = "Pause";
 	}
 
-	if (ImGui::Button("Step forward"))
+	if (pause)
 	{
-		step = true;
+		if (ImGui::Button("Step forward"))
+		{
+			step = true;
+		}
 	}
 	ImGui::Render();
 	TCC::buffer->swap();
