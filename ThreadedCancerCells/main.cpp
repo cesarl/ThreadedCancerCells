@@ -23,31 +23,36 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	static bool pause = false;
+	static bool step = false;
+
 	std::vector<std::future<std::array<unsigned int, 3>>> res;
 	res.resize(TCC::cancerBehaviours.size());
 
-	auto range = (unsigned int)std::ceil((float)(TCC::windowWidth * TCC::windowHeight) / (float)TCC::cancerBehaviours.size());
-	for (auto i = 0; i < TCC::cancerBehaviours.size(); ++i)
+	if (!pause || step)
 	{
-		auto from = range * i;
-		auto to = (from + range);
-		if (to > TCC::windowWidth * TCC::windowHeight)
-			to = TCC::windowWidth * TCC::windowHeight;
-		res[i] = TCC::cancerBehaviours[i]->getCommandQueue()
-			.priorityFutureEmplace<TCC::CancerBehaviour::Compute, std::array<unsigned int, 3>>(from, to);
-//		TCC::cancerBehaviours[i]->getCommandQueue().releaseReadability();
+		auto range = (unsigned int)std::ceil((float)(TCC::windowWidth * TCC::windowHeight) / (float)TCC::cancerBehaviours.size());
+		for (auto i = 0; i < TCC::cancerBehaviours.size(); ++i)
+		{
+			auto from = range * i;
+			auto to = (from + range);
+			if (to > TCC::windowWidth * TCC::windowHeight)
+				to = TCC::windowWidth * TCC::windowHeight;
+			res[i] = TCC::cancerBehaviours[i]->getCommandQueue()
+				.priorityFutureEmplace<TCC::CancerBehaviour::Compute, std::array<unsigned int, 3>>(from, to);
+			//		TCC::cancerBehaviours[i]->getCommandQueue().releaseReadability();
+		}
+
+
+		for (auto i = 0; i < res.size(); ++i)
+		{
+			auto t = res[i].get();
+			//counter[0] += t[0];
+			//counter[1] += t[1];
+			//counter[2] += t[2];
+		}
 	}
-
-
-	for (auto i = 0; i < res.size(); ++i)
-	{
-		auto t = res[i].get();
-		//counter[0] += t[0];
-		//counter[1] += t[1];
-		//counter[2] += t[2];
-	}
-
-
+	step = false;
 	TCC::buffer->fillDisplay(*TCC::displayBuffer);
 
 	for (auto i = 0; i < TCC::injectionThickness; ++i)
@@ -100,6 +105,7 @@ void display()
 	if (ImGui::SliderFloat("Zoom ", &TCC::zoom, 1, 15));
 	{
 	}
+
 	//ImGui::Text("Healthy cells : %i", TCC::Counter[TCC::Healthy]);
 	//ImGui::Text("Cancer cells : %i", TCC::Counter[TCC::Cancer]);
 	//ImGui::Text("Medecine cells : %i", TCC::Counter[TCC::Medecine]);
@@ -110,6 +116,15 @@ void display()
 		TCC::buffer->randomFill();
 	}
 
+	if (ImGui::Button("Pause"))
+	{
+		pause = !pause;
+	}
+
+	if (ImGui::Button("Step forward"))
+	{
+		step = true;
+	}
 	ImGui::Render();
 	TCC::buffer->swap();
 	glutSwapBuffers();
