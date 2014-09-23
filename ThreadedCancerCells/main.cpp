@@ -51,6 +51,8 @@ void display()
 			//counter[1] += t[1];
 			//counter[2] += t[2];
 		}
+
+		TCC::buffer->swap();
 	}
 	step = false;
 	TCC::buffer->fillDisplay(*TCC::displayBuffer);
@@ -97,7 +99,7 @@ void display()
 		TCC::buffer->randomFill();
 	}
 
-	if (ImGui::SliderInt("Threads number", &TCC::threadNumber, 1, 48))
+	if (ImGui::SliderInt("Threads number", &TCC::threadNumber, 1, 768))
 	{
 		initThreads();
 	}
@@ -135,7 +137,6 @@ void display()
 		}
 	}
 	ImGui::Render();
-	TCC::buffer->swap();
 	glutSwapBuffers();
 }
 

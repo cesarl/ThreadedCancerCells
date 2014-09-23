@@ -127,7 +127,7 @@ namespace TCC
 			return false;
 		}
 
-		bool countNeighbours(CellType type, int x, int y, unsigned short min)
+		bool countNeighbours(CellType type, const int x, const int y, unsigned short min)
 		{
 			short t = 8 - min + 1;
 			auto yw = 0;
@@ -154,7 +154,7 @@ namespace TCC
 			return true;
 		}
 
-		void computeCancer(int x, int y)
+		void computeCancer(const int x, const int y)
 		{
 			auto a = 0;
 			auto index = y * _width + x;
@@ -173,35 +173,53 @@ namespace TCC
 				auto yw = 0;
 
 				yw = ((y - 1) * _width) + x - 1;
+
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
-				_write[++yw] = _read[yw] == Medecine ? Healthy : _read[yw];
+
+				++yw;
+				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
-				_write[++yw] = _read[yw] == Medecine ? Healthy : _read[yw];
+
+				++yw;
+				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
+
 				yw = ((y)* _width) + x - 1;
+
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
-				_write[++yw] = _read[yw] == Medecine ? Healthy : _read[yw];
+
+				++yw;
+				_write[yw] = Healthy;
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
-				_write[++yw] = _read[yw] == Medecine ? Healthy : _read[yw];
+
+				++yw;
+				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
+
 				yw = ((y + 1)* _width) + x - 1;
+
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
-				_write[++yw] = _read[yw] == Medecine ? Healthy : _read[yw];
+
+				++yw;
+				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
-				_write[++yw] = _read[yw] == Medecine ? Healthy : _read[yw];
+
+				++yw;
+				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
 				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
+
 				return;
 			}
 			// E -> M
