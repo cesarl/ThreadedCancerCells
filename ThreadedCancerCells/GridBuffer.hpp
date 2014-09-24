@@ -168,7 +168,7 @@ namespace TCC
 				return;
 			}
 			// C -> H
-			if (r == Cancer && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Medecine, x, y, 6))
+			else if (r == Cancer && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Medecine, x, y, 6))
 			{
 				auto yw = 0;
 
@@ -223,7 +223,7 @@ namespace TCC
 				return;
 			}
 			// E -> M
-			if (r == None && hasNeighbour(Medecine, x, y))
+			else if (r == None && hasNeighbour(Medecine, x, y))
 			{
 				_write[index] = Medecine;
 				return;

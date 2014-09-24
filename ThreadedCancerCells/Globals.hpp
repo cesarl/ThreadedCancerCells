@@ -27,7 +27,7 @@ namespace TCC
 	int cancerPercent = 45;
 	int healthyPercent = 30;
 
-	int threadNumber = 50;
+	int threadNumber = 4;
 	bool running;
 
 	float zoom = 1.0f;

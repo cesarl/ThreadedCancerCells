@@ -99,7 +99,7 @@ void display()
 		TCC::buffer->randomFill();
 	}
 
-	if (ImGui::SliderInt("Threads number", &TCC::threadNumber, 1, 768))
+	if (ImGui::SliderInt("Threads number", &TCC::threadNumber, 1, 16))
 	{
 		initThreads();
 	}
