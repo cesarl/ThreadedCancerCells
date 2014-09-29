@@ -8,33 +8,24 @@
 
 void initThreads()
 {
-	if (TCC::threadNumber > TCC::workerThreads.size())
+	if ((unsigned int)TCC::threadNumber > TCC::workerThreads.size())
 	{
 		auto d = TCC::workerThreads.size();
 		TCC::workerThreads.resize(TCC::threadNumber);
-		for (auto i = d; i < TCC::threadNumber; ++i)
+		for (int i = d; i < TCC::threadNumber; ++i)
 		{
 			TCC::workerThreads[i] = std::make_unique<TCC::WorkerThread>();
 			TCC::workerThreads[i]->launch();
 		}
 	}
-	else if (TCC::threadNumber < TCC::workerThreads.size())
+	else if ((unsigned int)TCC::threadNumber < TCC::workerThreads.size())
 	{
-		for (auto i = TCC::workerThreads.size() - 1; i >= TCC::threadNumber; --i)
+		for (auto i = TCC::workerThreads.size() - 1; i >= (unsigned int)TCC::threadNumber; --i)
 		{
 			TCC::workerThreads[i]->quit();
 		}
 		TCC::workerThreads.resize(TCC::threadNumber);
 	}
-	//for (auto &e : TCC::workerThreads)
-	//	e->quit();
-	//TCC::workerThreads.clear();
-	//TCC::workerThreads.resize(TCC::threadNumber);
-	//for (auto i = 0; i < TCC::workerThreads.size(); ++i)
-	//{
-	//	TCC::workerThreads[i] = std::make_unique<TCC::WorkerThread>();
-	//	TCC::workerThreads[i]->launch();
-	//}
 }
 
 void display()
@@ -47,15 +38,10 @@ void display()
 	std::vector<std::future<std::array<unsigned int, 4>>> res;
 	res.resize(TCC::workerThreads.size());
 
-	TCC::Counter[TCC::Medecine] = 0;
-	TCC::Counter[TCC::Cancer] = 0;
-	TCC::Counter[TCC::None] = 0;
-	TCC::Counter[TCC::Healthy] = 0;
-
 	if (!pause || step)
 	{
 		auto range = (unsigned int)std::ceil((float)(TCC::windowWidth * TCC::windowHeight) / (float)TCC::workerThreads.size());
-		for (auto i = 0; i < TCC::workerThreads.size(); ++i)
+		for (std::size_t i = 0; i < TCC::workerThreads.size(); ++i)
 		{
 			auto from = range * i;
 			auto to = (from + range);
@@ -63,11 +49,15 @@ void display()
 				to = TCC::windowWidth * TCC::windowHeight;
 			res[i] = TCC::workerThreads[i]->getCommandQueue()
 				.priorityFutureEmplace<TCC::WorkerThread::Compute, std::array<unsigned int, 4>>(from, to);
-			//		TCC::workerThreads[i]->getCommandQueue().releaseReadability();
 		}
 
 
-		for (auto i = 0; i < res.size(); ++i)
+		TCC::Counter[TCC::Medecine] = 0;
+		TCC::Counter[TCC::Cancer] = 0;
+		TCC::Counter[TCC::None] = 0;
+		TCC::Counter[TCC::Healthy] = 0;
+
+		for (std::size_t i = 0; i < res.size(); ++i)
 		{
 			auto t = res[i].get();
 			TCC::Counter[0] += t[0];
@@ -91,7 +81,7 @@ void display()
 
 	if (TCC::rMouse)
 	{
-		TCC::buffer->inject(TCC::mouse_x / TCC::zoom, (TCC::windowHeight - TCC::mouse_y) / TCC::zoom);
+		TCC::buffer->inject((unsigned int)(TCC::mouse_x / TCC::zoom), (unsigned int)((TCC::windowHeight - TCC::mouse_y) / TCC::zoom));
 	}
 
 	TCC::displayBuffer->render();
@@ -128,9 +118,7 @@ void display()
 		initThreads();
 	}
 
-	if (ImGui::SliderFloat("Zoom ", &TCC::zoom, 1, 15));
-	{
-	}
+	ImGui::SliderFloat("Zoom ", &TCC::zoom, 1, 15);
 
 	ImGui::Text("Healthy cells : %i", TCC::Counter[TCC::Healthy]);
 	ImGui::Text("Cancer cells : %i", TCC::Counter[TCC::Cancer]);

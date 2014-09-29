@@ -32,11 +32,11 @@ namespace TCC
 			auto so = sizeof(unsigned char) * 3;
 			unsigned char c[3] = { color.x, color.y, color.z };
 			auto t = _width * _height;
-			for (auto i = 0; i < _width; ++i)
+			for (unsigned int i = 0; i < _width; ++i)
 			{
 				memcpy((void*)(&_buffer[i * 3]), (void*)(&c), so);
 			}
-			for (auto i = 1; i < _height; ++i)
+			for (unsigned int i = 1; i < _height; ++i)
 			{
 				memcpy((void*)(&_buffer[i * _width * 3]), (void*)(&_buffer[0]), _width * so);
 			}
@@ -44,9 +44,9 @@ namespace TCC
 
 		void randomFill()
 		{
-			for (auto i = 0; i < _width; ++i)
+			for (unsigned int i = 0; i < _width; ++i)
 			{
-				for (auto j = 0; j < _height; ++j)
+				for (unsigned int j = 0; j < _height; ++j)
 				{
 					drawPixel(glm::uvec2(i, j), glm::uvec3(rand() % 255, rand() % 255, rand() % 255));
 				}
@@ -79,8 +79,8 @@ namespace TCC
 				std::swap(from.y, to.y);
 			}
  
-			const float dx = to.x - from.y;
-			const float dy = fabs((float)to.y - from.y);
+			const float dx = (float)(to.x - from.y);
+			const float dy = (float)(fabs((float)to.y - from.y));
  
 			float error = dx / 2.0f;
 			const int ystep = (from.y < to.y) ? 1 : -1;

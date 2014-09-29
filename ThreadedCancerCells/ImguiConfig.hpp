@@ -135,7 +135,7 @@ namespace ImguiConf
 
 		static double time = glutGet(GLUT_ELAPSED_TIME);;
 		const double current_time = glutGet(GLUT_ELAPSED_TIME);
-		float dif = current_time - time;
+		float dif = (float)(current_time - time);
 		io.DeltaTime = dif == 0.0f ? 0.000000001f : dif / 1000.0f;
 		time = current_time;
 		// Setup inputs

@@ -14,9 +14,9 @@ namespace TCC
 		CellType *_buffer2;
 		CellType *_read;
 		CellType *_write;
-		int _width;
-		int _height;
-		int _total;
+		unsigned int _width;
+		unsigned int _height;
+		unsigned int _total;
 	public:
 		GridBuffer(int width, int height)
 			: _width(width)
@@ -51,7 +51,7 @@ namespace TCC
 
 		bool isCell(int x, int y, CellType t)
 		{
-			if (x >= _width || y >= _height)
+			if ((unsigned int)x >= _width || (unsigned int)y >= _height)
 				return false;
 			return _read[y * _width + x] == t;
 		}
@@ -63,7 +63,7 @@ namespace TCC
 
 		void setCellWithRule(int x, int y, CellType t)
 		{
-			if (x >= _width || y >= _height || x < 0 || y < 0)
+			if ((unsigned int)x >= _width || (unsigned int)y >= _height || x < 0 || y < 0)
 				return;
 			if (t == Medecine && _read[y * _width + x] == Cancer)
 			{
@@ -98,22 +98,22 @@ namespace TCC
 					return true;
 				if (_read[++yw] == type)
 					return true;
-				if (x < _width - 1 && _read[++yw] == type)
+				if ((unsigned int)x < _width - 1 && _read[++yw] == type)
 					return true;
 			}
 			yw = ((y) * _width) + x - 1;
 			if (x > 0 && _read[yw] == type)
 				return true;
-			if (x < _width - 1 && _read[yw + 2] == type)
+			if ((unsigned int)x < _width - 1 && _read[yw + 2] == type)
 				return true;
-			if (y < _height - 1)
+			if ((unsigned int)y < _height - 1)
 			{
 				yw = ((y + 1) * _width) + x - 1;
 				if (x > 0 && _read[yw] == type)
 					return true;
 				if (_read[++yw] == type)
 					return true;
-				if (x < _width - 1 && _read[++yw] == type)
+				if ((unsigned int)x < _width - 1 && _read[++yw] == type)
 					return true;
 			}
 			return false;
