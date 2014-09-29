@@ -58,8 +58,6 @@ namespace TCC
 
 		void setCell(int x, int y, CellType t)
 		{
-			--TCC::Counter[_read[y * _width + x]];
-			++TCC::Counter[t];
 			_write[y * _width + x] = t;
 		}
 
@@ -69,21 +67,15 @@ namespace TCC
 				return;
 			if (t == Medecine && _read[y * _width + x] == Cancer)
 			{
-				--TCC::Counter[Cancer];
-				++TCC::Counter[Healthy];
 				_write[y * _width + x] = Healthy;
 				return;
 			}
-			--TCC::Counter[_read[y * _width + x]];
-			++TCC::Counter[t];
 			_write[y * _width + x] = t;
 		}
 
 		void setCell(int i, CellType t)
 		{
 			_write[i] = t;
-			--TCC::Counter[_read[i]];
-			++TCC::Counter[t];
 		}
 
 		void fillDisplay(Display &display)
@@ -162,10 +154,8 @@ namespace TCC
 			auto &r = _read[index];
 			if (r == Healthy && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Cancer, x, y, 6))
 			{
-				--TCC::Counter[r];
 				++TCC::Counter[Cancer];
 				_write[index] = Cancer;
-				return;
 			}
 			// C -> H
 			else if (r == Cancer && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Medecine, x, y, 6))
@@ -175,58 +165,51 @@ namespace TCC
 				yw = ((y - 1) * _width) + x - 1;
 
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
 
 				yw = ((y)* _width) + x - 1;
 
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
 
 				++yw;
 				_write[yw] = Healthy;
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
 
 				yw = ((y + 1)* _width) + x - 1;
 
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				--TCC::Counter[_read[yw]];
 				++TCC::Counter[_write[yw]];
-
-				return;
 			}
 			// E -> M
 			else if (r == None && hasNeighbour(Medecine, x, y))
 			{
 				_write[index] = Medecine;
-				return;
+				++TCC::Counter[Medecine];
+			}
+			else
+			{
+				++TCC::Counter[_read[index]];
 			}
 		}
 

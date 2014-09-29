@@ -29,6 +29,11 @@ void display()
 	std::vector<std::future<std::array<unsigned int, 3>>> res;
 	res.resize(TCC::cancerBehaviours.size());
 
+	TCC::Counter[TCC::Medecine] = 0;
+	TCC::Counter[TCC::Cancer] = 0;
+	TCC::Counter[TCC::None] = 0;
+	TCC::Counter[TCC::Healthy] = 0;
+
 	if (!pause || step)
 	{
 		auto range = (unsigned int)std::ceil((float)(TCC::windowWidth * TCC::windowHeight) / (float)TCC::cancerBehaviours.size());
@@ -108,10 +113,10 @@ void display()
 	{
 	}
 
-	//ImGui::Text("Healthy cells : %i", TCC::Counter[TCC::Healthy]);
-	//ImGui::Text("Cancer cells : %i", TCC::Counter[TCC::Cancer]);
-	//ImGui::Text("Medecine cells : %i", TCC::Counter[TCC::Medecine]);
-	//ImGui::Text("Empty cells : %i", TCC::Counter[TCC::None]);
+	ImGui::Text("Healthy cells : %i", TCC::Counter[TCC::Healthy]);
+	ImGui::Text("Cancer cells : %i", TCC::Counter[TCC::Cancer]);
+	ImGui::Text("Medecine cells : %i", TCC::Counter[TCC::Medecine]);
+	ImGui::Text("Empty cells : %i", TCC::Counter[TCC::None]);
 
 	if (ImGui::Button("Reset"))
 	{
@@ -151,10 +156,6 @@ void initialize ()
 	TCC::buffer = new TCC::GridBuffer(TCC::windowWidth, TCC::windowHeight);
 	initThreads();
 	ImguiConf::InitImGui();
-	TCC::Counter[0] = 0;
-	TCC::Counter[1] = 0;
-	TCC::Counter[2] = 0;
-	TCC::Counter[3] = 0;
 	TCC::buffer->randomFill();
 }
 
