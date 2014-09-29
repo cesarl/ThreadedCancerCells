@@ -9,7 +9,7 @@ namespace TCC
 {
 	class Display;
 	class GridBuffer;
-	class CancerBehaviour;
+	class WorkerThread;
 	class MedecineManager;
 
 	//////////
@@ -36,10 +36,10 @@ namespace TCC
 
 	MedecineManager *medecineManager;
 
-	std::vector<std::unique_ptr<TCC::CancerBehaviour>> cancerBehaviours;
+	std::vector<std::unique_ptr<TCC::WorkerThread>> workerThreads;
 
 	typedef glm::uvec2 Position;
 	typedef glm::uvec3 Color;
 
-	static std::array<std::atomic_uint, 4> Counter;
+	static std::array<unsigned int, 4> Counter;
 }

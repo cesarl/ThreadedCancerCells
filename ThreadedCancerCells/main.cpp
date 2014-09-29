@@ -4,19 +4,37 @@
 #include "Globals.hpp"
 #include "ImguiConfig.hpp"
 #include "GridBuffer.hpp"
-#include "CancerBehaviour.hpp"
+#include "WorkerThread.hpp"
 
 void initThreads()
 {
-	for (auto &e : TCC::cancerBehaviours)
-		e->quit();
-	TCC::cancerBehaviours.clear();
-	TCC::cancerBehaviours.resize(TCC::threadNumber);
-	for (auto i = 0; i < TCC::cancerBehaviours.size(); ++i)
+	if (TCC::threadNumber > TCC::workerThreads.size())
 	{
-		TCC::cancerBehaviours[i] = std::make_unique<TCC::CancerBehaviour>();
-		TCC::cancerBehaviours[i]->launch();
+		auto d = TCC::workerThreads.size();
+		TCC::workerThreads.resize(TCC::threadNumber);
+		for (auto i = d; i < TCC::threadNumber; ++i)
+		{
+			TCC::workerThreads[i] = std::make_unique<TCC::WorkerThread>();
+			TCC::workerThreads[i]->launch();
+		}
 	}
+	else if (TCC::threadNumber < TCC::workerThreads.size())
+	{
+		for (auto i = TCC::workerThreads.size() - 1; i >= TCC::threadNumber; --i)
+		{
+			TCC::workerThreads[i]->quit();
+		}
+		TCC::workerThreads.resize(TCC::threadNumber);
+	}
+	//for (auto &e : TCC::workerThreads)
+	//	e->quit();
+	//TCC::workerThreads.clear();
+	//TCC::workerThreads.resize(TCC::threadNumber);
+	//for (auto i = 0; i < TCC::workerThreads.size(); ++i)
+	//{
+	//	TCC::workerThreads[i] = std::make_unique<TCC::WorkerThread>();
+	//	TCC::workerThreads[i]->launch();
+	//}
 }
 
 void display()
@@ -26,8 +44,8 @@ void display()
 	static bool pause = false;
 	static bool step = false;
 
-	std::vector<std::future<std::array<unsigned int, 3>>> res;
-	res.resize(TCC::cancerBehaviours.size());
+	std::vector<std::future<std::array<unsigned int, 4>>> res;
+	res.resize(TCC::workerThreads.size());
 
 	TCC::Counter[TCC::Medecine] = 0;
 	TCC::Counter[TCC::Cancer] = 0;
@@ -36,25 +54,26 @@ void display()
 
 	if (!pause || step)
 	{
-		auto range = (unsigned int)std::ceil((float)(TCC::windowWidth * TCC::windowHeight) / (float)TCC::cancerBehaviours.size());
-		for (auto i = 0; i < TCC::cancerBehaviours.size(); ++i)
+		auto range = (unsigned int)std::ceil((float)(TCC::windowWidth * TCC::windowHeight) / (float)TCC::workerThreads.size());
+		for (auto i = 0; i < TCC::workerThreads.size(); ++i)
 		{
 			auto from = range * i;
 			auto to = (from + range);
 			if (to > TCC::windowWidth * TCC::windowHeight)
 				to = TCC::windowWidth * TCC::windowHeight;
-			res[i] = TCC::cancerBehaviours[i]->getCommandQueue()
-				.priorityFutureEmplace<TCC::CancerBehaviour::Compute, std::array<unsigned int, 3>>(from, to);
-			//		TCC::cancerBehaviours[i]->getCommandQueue().releaseReadability();
+			res[i] = TCC::workerThreads[i]->getCommandQueue()
+				.priorityFutureEmplace<TCC::WorkerThread::Compute, std::array<unsigned int, 4>>(from, to);
+			//		TCC::workerThreads[i]->getCommandQueue().releaseReadability();
 		}
 
 
 		for (auto i = 0; i < res.size(); ++i)
 		{
 			auto t = res[i].get();
-			//counter[0] += t[0];
-			//counter[1] += t[1];
-			//counter[2] += t[2];
+			TCC::Counter[0] += t[0];
+			TCC::Counter[1] += t[1];
+			TCC::Counter[2] += t[2];
+			TCC::Counter[3] += t[3];
 		}
 
 		TCC::buffer->swap();
@@ -217,7 +236,7 @@ int main(int argc, char **argv)
 	TCC::running = true;
 	delete TCC::displayBuffer;
 	ImGui::Shutdown();
-	for (auto &e : TCC::cancerBehaviours)
+	for (auto &e : TCC::workerThreads)
 		e->quit();
 	return 0;
 }

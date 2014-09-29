@@ -7,11 +7,11 @@
 
 namespace TCC
 {
-	class CancerBehaviour : public ThreadQueue
+	class WorkerThread : public ThreadQueue
 	{
-		std::array<unsigned int, 3> _counter;
+		std::array<unsigned int, 4> _counter;
 	public:
-		struct Compute : TMQ::FutureData<std::array<unsigned int, 3>>
+		struct Compute : TMQ::FutureData<std::array<unsigned int, 4>>
 		{
 			Compute(unsigned int _from, unsigned int _to)
 				: from(_from)
@@ -30,7 +30,7 @@ namespace TCC
 				_counter.fill(0);
 				for (auto i = msg.from; i < msg.to; ++i)
 				{
-					buffer->computeCancer(i % TCC::windowWidth, i / TCC::windowWidth);
+					buffer->computeCancer(i % TCC::windowWidth, i / TCC::windowWidth, _counter);
 				}
 				msg.result.set_value(_counter);
 			})
@@ -60,7 +60,7 @@ namespace TCC
 			return true;
 		}
 
-		CancerBehaviour()
+		WorkerThread()
 		{
 		}
 	};

@@ -146,7 +146,7 @@ namespace TCC
 			return true;
 		}
 
-		void computeCancer(const int x, const int y)
+		void computeCancer(const int x, const int y, std::array<unsigned int, 4> &counter)
 		{
 			auto a = 0;
 			auto index = y * _width + x;
@@ -154,7 +154,7 @@ namespace TCC
 			auto &r = _read[index];
 			if (r == Healthy && !(y == 0 || y == _height - 1 || x == 0 || x == _width - 1) && countNeighbours(Cancer, x, y, 6))
 			{
-				++TCC::Counter[Cancer];
+				++counter[Cancer];
 				_write[index] = Cancer;
 			}
 			// C -> H
@@ -165,51 +165,51 @@ namespace TCC
 				yw = ((y - 1) * _width) + x - 1;
 
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 
 				yw = ((y)* _width) + x - 1;
 
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 
 				++yw;
 				_write[yw] = Healthy;
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 
 				yw = ((y + 1)* _width) + x - 1;
 
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 
 				++yw;
 				_write[yw] = _read[yw] == Medecine ? Healthy : _read[yw];
-				++TCC::Counter[_write[yw]];
+				++counter[_write[yw]];
 			}
 			// E -> M
 			else if (r == None && hasNeighbour(Medecine, x, y))
 			{
 				_write[index] = Medecine;
-				++TCC::Counter[Medecine];
+				++counter[Medecine];
 			}
 			else
 			{
-				++TCC::Counter[_read[index]];
+				++counter[r];
 			}
 		}
 

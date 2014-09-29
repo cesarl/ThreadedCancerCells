@@ -71,10 +71,10 @@
     <ClInclude Include="Cell.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CancerBehaviour.hpp">
+    <ClInclude Include="ThreadQueue.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ThreadQueue.hpp">
+    <ClInclude Include="WorkerThread.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
