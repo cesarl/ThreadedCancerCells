@@ -1,3 +1,6 @@
+# Multi-core programming homework 1
+## César Leblic
+
 ### Langage version and libraries used
 
 #### C++11
@@ -30,9 +33,12 @@ We'll see further in this document that using TMQ was not the simpler option but
 
 Architecture is relatively simple, it count a small number of class :
 - `Display` which is nothing more than a array of `char`. Pixel colors are writed in it and data are send to the GPU with `glDrawPixels` for the rendering.
+
 - `GridBuffer` is one of the more important class of the program. It contain two buffers of `enum Celltype` (each `CellType` have the same size that an `unsigned char`), one for the reading, one for the writing. So that threads, when computing new state will read in the `read` buffer and save the solution in the `write` buffer. Then for the next step, buffer will be swapped so that `read` buffer will be used as `write` buffer and vice versa.
 In addition `GridBuffer` class contain all methods and rules which permit to compute the new state. Threads will call them at execution time.
+
 - `ThreadQueue` are the combination between a thread and a `TMQ::Queue`. At it's creation a thread is launched and will wait for task to be pushed in the queue. I'll explain in more details how does TMQ works further.
+
 - `WorkerThread` inherit from `ThreadQueue` and implement callback function when a task is received in the queue.
 
 #### Workflow explaination
